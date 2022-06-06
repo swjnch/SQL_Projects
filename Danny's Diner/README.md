@@ -18,7 +18,7 @@ Danny has shared with you 3 key datasets for this case study:
 - menu
 - members
 
-Please refer to this [link] for ER diagram and datasets.
+Please refer to this [link](https://8weeksqlchallenge.com/case-study-1/) for ER diagram and datasets.
 
 ### Case Study Questions
 
