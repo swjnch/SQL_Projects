@@ -8,7 +8,7 @@
                      USING(product_id)
                      GROUP BY customer_id;
 
-![image](https://user-images.githubusercontent.com/104596844/172208501-60448c83-d94f-4cd0-8b5c-9dcd4f06baba.png)
+![image](https://user-images.githubusercontent.com/104596844/172214535-6f29c786-f8b2-44c2-b75b-ea7f8d21fc34.png)
 
 Customer A has spent 76$.
 Customer B spent 74$.
@@ -50,8 +50,45 @@ Customer A ordered sushi and curry on the same day.
 Customer B ordered curry.
 Customer C ordered ramen
 
-6. What is the most purchased item on the menu and how many times was it purchased by all customers?
-7. Which item was the most popular for each customer?
+4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+                           SELECT m.product_name,
+	                          COUNT(product_id) as most_ordered
+                            FROM  sales s
+                            JOIN menu m
+                            USING (product_id)
+                            GROUP BY product_id
+                            ORDER BY most_ordered DESC
+                            LIMIT 1;
+			    
+![image](https://user-images.githubusercontent.com/104596844/172215105-1cfef268-c0fb-482a-ae72-cb3718125388.png)
+
+Ramen is the most ordered item on menu.
+
+5. Which item was the most popular for each customer?
+
+                                            WITH most_popular AS(
+                                                               SELECT * FROM (
+	                                                                      SELECT customer_id,
+		                                                                      product_name,
+                                                                                      COUNT(product_id) as order_count,
+		                                                                      RANK () OVER (partition by customer_id order by COUNT(product_id) desc)                                                                                             ranking
+	                                                                       FROM sales
+	                                                                      JOIN  menu
+                                                                               USING(product_id)
+	                                                                    GROUP BY customer_id, product_id
+                                                                 )t)
+                                                            SELECT customer_id,
+		                                                   product_name,
+                                                                   order_count
+                                                            FROM most_popular
+                                                           WHERE ranking=1;
+							   
+![image](https://user-images.githubusercontent.com/104596844/172216242-2877937e-06f0-40fd-9e2f-c5d99d80ee80.png)
+
+Customer A and C ordered ramen thrice and Customer B order all the items twice from the menu.
+
+
 8. Which item was purchased first by the customer after they became a member?
 9. Which item was purchased just before the customer became a member?
 10. What is the total items and amount spent for each member before they became a member?
