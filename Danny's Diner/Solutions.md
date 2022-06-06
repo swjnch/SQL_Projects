@@ -88,9 +88,136 @@ Ramen is the most ordered item on menu.
 
 Customer A and C ordered ramen thrice and Customer B order all the items twice from the menu.
 
+6. Which item was purchased first by the customer after they became a member?
+                            
+			    WITH after_member AS(
+                                                   SELECT * FROM (
+                                                                   SELECT *,
+                                                                        DENSE_RANK () OVER (partition by customer_id order by order_date) ranking
+                                                                   FROM members
+                                                                   JOIN sales
+                                                                   USING(customer_id)
+                                                                   JOIN menu
+                                                                   USING(product_id)
+                                                                   WHERE order_date>=join_date
+                                                                  ORDER BY customer_id)t
+								 )
+                                                                   SELECT customer_id,
+		                                                          product_name,
+                                                                          join_date,
+                                                                          order_date
+                                                                   FROM after_member
+                                                                   WHERE ranking=1;
+							
 
-8. Which item was purchased first by the customer after they became a member?
-9. Which item was purchased just before the customer became a member?
-10. What is the total items and amount spent for each member before they became a member?
-11. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
-12. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+7. Which item was purchased just before the customer became a member?
+                             
+			      WITH before_member AS(
+                                                  SELECT * FROM (
+                                                                 SELECT *, 
+                                                                      RANK () OVER (partition by customer_id order by order_date DESC) ranking
+                                                                 FROM members
+                                                                  JOIN sales
+                                                                  USING(customer_id)
+                                                                  JOIN menu
+                                                                  USING(product_id)
+                                                                  WHERE order_date < join_date
+                                                                  ORDER BY customer_id)t
+								   )
+                                                                   SELECT customer_id,
+	                                                                  product_name,
+                                                                           join_date,
+                                                                           order_date
+                                                                       FROM before_member
+                                                                       WHERE ranking=1;
+								       
+![image](https://user-images.githubusercontent.com/104596844/172222614-51564d71-9d0a-4a6a-88c6-b942ac5a1c0b.png)
+
+Customer A has ordered sushi and curry.Customer B ordered sushi
+
+8. What is the total items and amount spent for each member before they became a member?
+
+                                            SELECT customer_id,
+                                                   COUNT(product_id) AS total_items,
+                                                   SUM(price) AS total_amt
+                                            FROM menu
+                                            JOIN sales
+                                            USING(product_id)
+                                            JOIN members
+                                            USING(customer_id)
+                                            WHERE order_date<join_date
+                                            GROUP BY customer_id
+                                            ORDER BY customer_id;
+					    
+![image](https://user-images.githubusercontent.com/104596844/172223155-b136b3eb-fd28-48d0-b370-9f6982a6c247.png)
+
+Customer A ordered a total of 2 items that total upto 25$ and Customer B ordered 3 items for 40$.
+
+9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+
+                  SELECT
+	                customer_id,
+                        SUM(CASE WHEN product_name = "sushi" THEN (20*price) ELSE (10*price) END) AS points
+                 FROM sales
+                 JOIN menu
+                 USING(product_id)
+                 WHERE customer_id IN (SELECT customer_id FROM members)
+                GROUP BY customer_id
+                ORDER BY customer_id;
+		
+![image](https://user-images.githubusercontent.com/104596844/172223720-8432f174-c5eb-4b52-ab02-20318c131bed.png)
+
+Customer A has a total of 860 points where as Customer B has 940 points.
+
+10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+
+                                      SELECT customer_id,
+	                                     SUM(CASE
+					            WHEN DATEDIFF(order_date,join_date) BETWEEN 0 AND 6 THEN (20*price)
+		                                    WHEN product_name = "sushi" THEN (20*price)
+                                                ELSE (10*price)
+                                                END) AS points
+                                     FROM members
+                                     JOIN sales
+                                     USING(customer_id)
+                                     JOIN menu
+                                     USING(product_id)
+                                     WHERE ORDER_DATE BETWEEN "2021-01-01" AND "2021-01-31"
+                                     GROUP BY customer_id
+                                     ORDER BY customer_id;
+				     
+![image](https://user-images.githubusercontent.com/104596844/172224340-a292abe2-069d-462a-a386-38d82e01104f.png)
+
+Customer A has total of 1370 points where as Customer B has 820 points.
+
+#### Bonus Question 1
+                                       CREATE VIEW join_table AS
+                                                           SELECT customer_id,
+                                                                   order_date,
+                                                                  product_name,
+                                                                  price,
+                                                                  (CASE
+                                                                       WHEN order_date >= join_date THEN "Y" ELSE "N" END) AS member
+                                                          FROM sales
+                                                          JOIN menu
+                                                          USING(product_id)
+                                                           LEFT JOIN members
+                                                           USING(customer_id);
+
+![image](https://user-images.githubusercontent.com/104596844/172226122-bceb07f4-769c-435e-8c47-ba7faec9edef.png)
+
+#### Bonus Question 2
+
+                        CREATE VIEW ranking AS
+                                                SELECT *, 
+                                                          (CASE
+                                                                 WHEN member = "N" THEN "null"
+                                                                ELSE DENSE_RANK() Over (PARTITION BY customer_id, member ORDER BY order_date)
+                                                                END) ranking
+                                               FROM join_table;
+					       
+![image](https://user-images.githubusercontent.com/104596844/172226436-4ab0ba3e-f48a-4f0b-afed-d8744ccb4b91.png)
+
+
+
+
