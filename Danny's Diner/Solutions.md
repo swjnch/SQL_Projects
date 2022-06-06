@@ -27,11 +27,33 @@ Customer A visted for 4 days.
 Customer B visited for 6 days.
 Customer C visited for 2 days.
 
-4. What was the first item from the menu purchased by each customer?
-5. What is the most purchased item on the menu and how many times was it purchased by all customers?
-6. Which item was the most popular for each customer?
-7. Which item was purchased first by the customer after they became a member?
-8. Which item was purchased just before the customer became a member?
-9. What is the total items and amount spent for each member before they became a member?
-10. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
-11. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+3. What was the first item from the menu purchased by each customer?
+
+                       WITH first_ordered AS(
+                                 SELECT customer_id,
+                                 order_date,
+		                 product_name,
+		                 DENSE_RANK () OVER (partition by customer_id order by order_date) as ranking
+                                 FROM sales 
+                                 JOIN menu 
+                                USING(product_id)
+                       )
+                      SELECT customer_id, 
+		              product_name
+                              FROM first_ordered
+                      WHERE ranking = 1
+                      GROUP BY customer_id, product_name;
+		      
+![image](https://user-images.githubusercontent.com/104596844/172213229-27268434-d881-4a4b-b1f8-09d2a0fea570.png)
+
+Customer A ordered sushi and curry on the same day.
+Customer B ordered curry.
+Customer C ordered ramen
+
+6. What is the most purchased item on the menu and how many times was it purchased by all customers?
+7. Which item was the most popular for each customer?
+8. Which item was purchased first by the customer after they became a member?
+9. Which item was purchased just before the customer became a member?
+10. What is the total items and amount spent for each member before they became a member?
+11. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+12. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
