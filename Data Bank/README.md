@@ -18,4 +18,4 @@ This case study is all about calculating metrics, growth and helping the busines
 
 The Data Bank team have prepared a data model for this case study as well as a few example rows from the complete dataset below to get you familiar with their tables.
 
-Please refer this [page](https://8weeksqlchallenge.com/case-study-4/) for Er diagrams, data tables and questions.
+Please refer to this [page](https://8weeksqlchallenge.com/case-study-4/) for ER diagrams, data tables and questions.
