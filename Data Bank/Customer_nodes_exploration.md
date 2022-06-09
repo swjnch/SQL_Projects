@@ -74,15 +74,18 @@ previous and start dates for new nodes are assisgned. Finnaly to find the averag
                                                                                    SELECT * FROM median_days;
                                                                    
                                                                    ## Median
-                                                                   SET @ROWINDEX:= -1;
-                                                                   SELECT AVG(N.total_days) AS MEDIAN_VALUE
-                                                                          FROM (SELECT @ROWINDEX:= @ROWINDEX+1 AS rowindex,
-                                                                                        total_days AS total_days
-	                                                                              FROM tmp
-                                                                                ORDER BY total_days) AS N
-                                                                    WHERE N.ROWINDEX IN (FLOOR(@ROWINDEX/2), CEIL(@ROWINDEX/2));
+                                                                   SELECT  region_id, 
+                                                                           avg(total_days) as median_val
+                                                                    FROM (
+	                                                                  SELECT region_id,
+			                                                         total_days, 
+                                                                                 row_number() over(partition by region_id order by total_days) rn,
+                                                                                 count(*) over(partition by region_id) cnt
+                                                                          FROM temp1
+                                                                          )AS N
+                                                                    WHERE rn in (FLOOR((cnt + 1) / 2), FLOOR( (cnt + 2) / 2))
                                                                     
- ![image](https://user-images.githubusercontent.com/104596844/172869241-97efe997-e1e9-4ffc-bc7a-5872711933a6.png)
+ ![image](https://user-images.githubusercontent.com/104596844/172882232-cea8209d-19d8-4b11-8658-a9a6580b088a.png)
 
                                                                     
                                                                     ## 95th percentile
