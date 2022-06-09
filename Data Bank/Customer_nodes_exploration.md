@@ -53,60 +53,43 @@ previous and start dates for new nodes are assisgned. Finnaly to find the averag
 
 5. What is the median, 80th and 95th percentile for this same reallocation days metric for each region?
 
-                                          CREATE TEMPORARY TABLE tmp 
-                                                                  WITH median_ct AS(
-					                                                                        SELECT *, 
-							                                                                          LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date) AS new_node,
-							                                                                          CASE 
-								                                                                            WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))- node_id)= 0 THEN NULL
-								                                                                            WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))- node_id) <> 0
-								                                                                                 THEN (LEAD(start_date,1) OVER (PARTITION BY customer_id ORDER BY start_date))
-								                                                                         END as new_node_date
-					                                                                        FROM customer_nodes
-					                                                                       WHERE YEAR(end_date) <> 9999),
-                                                                    median_days AS(
-                                                                                  SELECT *,
-                                                                                          DATEDIFF(new_node_date, start_date) AS total_days
-			                                                                            FROM median_ct
-			                                                                                    WHERE node_id <> new_node
-                                                                                          ORDER BY DATEDIFF(new_node_date, start_date)
-                                                                                    )
-                                                                                   SELECT * FROM median_days;
+                                CREATE TEMPORARY TABLE tmp 
+                                                          WITH median_ct AS(
+					                                    SELECT *, 
+							                            LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date) AS                                                                                              new_node,
+							                             CASE 
+								                          WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY                                                                                                                                   start_date))- node_id)= 0 THEN NULL
+								                          WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY                                                                                                                                   start_date))- node_id) <> THEN                                                                                                            (LEAD(start_date,1) OVER (PARTITION BY customer_id ORDER BY start_date))
+								                      END as new_node_date
+					                                      FROM customer_nodes
+					                                      WHERE YEAR(end_date) <> 9999),
+                                                             median_days AS(
+                                                                            SELECT *,
+                                                                                    DATEDIFF(new_node_date, start_date) AS total_days
+			                                                     FROM median_ct
+			                                                     WHERE node_id <> new_node
+                                                                             ORDER BY DATEDIFF(new_node_date, start_date)
+                                                                             )
+                                                                             SELECT * FROM median_days;
                                                                    
-                                                                   ## Median
-                                                                   SELECT  region_id, 
-                                                                           avg(total_days) as median_val
-                                                                    FROM (
-	                                                                  SELECT region_id,
-			                                                         total_days, 
-                                                                                 row_number() over(partition by region_id order by total_days) rn,
-                                                                                 count(*) over(partition by region_id) cnt
-                                                                          FROM temp1
-                                                                          )AS N
-                                                                    WHERE rn in (FLOOR((cnt + 1) / 2), FLOOR( (cnt + 2) / 2))
+                                                                   ## Median, 80th percentile and 95th percentile
+                                    WITH median_table AS(
+                                                         SELECT region_id, 
+	                                                        total_days, 
+                                                                 count(*) OVER(partition by region_id) as no_of_records,
+				                                  row_number() over (partition by region_id order by total_days) as rownum
+                                                           FROM temp1)
+                                                           SELECT region_id,
+				                                  total_days as percentile_values
+		                                            FROM median_table
+		                                            WHERE rownum in (round(0.50*no_of_records), 
+						                             round(0.80*no_of_records), 
+						                             round(0.95*no_of_records));
                                                                     
- ![image](https://user-images.githubusercontent.com/104596844/172882232-cea8209d-19d8-4b11-8658-a9a6580b088a.png)
+ ![image](https://user-images.githubusercontent.com/104596844/172893044-078569a1-29f3-4f98-a78d-47813696b3f4.png)
+ 
+ Both the temporary table and common table expressions were used to generate median and percentile values.All the 5 regions have a median of 16 days that is similar to the average, which indicates that data is normally distributed and symmetric. Regions 1,2 and 4 have 24 days in the 80th percentile, regions 3 and 5 have 25days and 26days respectively. The 5 regions have 29 days in the 95th percentile.
 
-                                                                    
-                                                                    ## 95th percentile
-                                                                    SELECT * FROM 
-                                                                                (SELECT total_days,  
-                                                                                        @row_num :=@row_num + 1 AS row_num FROM tmp, 
-                                                                                        (SELECT @row_num:=0) counter 
-                                                                                         ORDER BY total_days) N
-                                                                    WHERE N.row_num = ROUND (.95* @row_num); 
-                                                                    
- ![image](https://user-images.githubusercontent.com/104596844/172869402-80e92279-33e7-443f-84e0-12209cbf3446.png)
-  
-                                                                    ## 80th percentile
-                                                                    SELECT * FROM 
-                                                                               (SELECT total_days,  
-                                                                                       @row_num :=@row_num + 1 AS row_num FROM tmp, 
-                                                                                       (SELECT @row_num:=0) counter 
-                                                                                       ORDER BY total_days) N
-                                                                     WHERE N.row_num = ROUND (.80 * @row_num);
-                                                                     
-  ![image](https://user-images.githubusercontent.com/104596844/172869573-56a2bc04-9774-4d27-9aa7-b685ca637763.png)
 
                                                                      
                                                                      
