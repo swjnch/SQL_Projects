@@ -121,8 +121,29 @@ Customer 103 had maximum number of changes included with the order.
                                                         
  ![image](https://user-images.githubusercontent.com/104596844/172410330-ffae36ba-5e46-4478-8226-64f71dc4554d.png)
  
- Only one delivered pizza has both inclusions and extras.
+ Only one delivered pizza has both exclusions and extras.
 
-What was the total volume of pizzas ordered for each hour of the day?
+9. What was the total volume of pizzas ordered for each hour of the day?
+                        
+			SELECT HOUR(order_time) AS hour_of_day,
+                               COUNT(order_id) AS total_pizzas
+                        FROM temp_orders
+                        GROUP BY HOUR(order_time)
+                        ORDER BY HOUR(order_time);
+			
+![image](https://user-images.githubusercontent.com/104596844/173192451-d14988c9-564e-457b-8769-0e5f89e95a15.png)
 
-What was the volume of orders for each day of the week?
+High volume of pizzas were ordered around 13(1.00 pm), 18(6.00 pm), 21(9.00 pm) and 23(11.00 pm). 
+
+10. What was the volume of orders for each day of the week?
+
+                     SELECT DAYNAME(order_time) AS hour_of_day,
+	                    COUNT(order_id) AS total_pizzas
+                     FROM temp_orders
+                     GROUP BY DAYNAME(order_time)
+                     ORDER BY DAY(order_time);
+		     
+![image](https://user-images.githubusercontent.com/104596844/173192620-5ee6815a-851b-4d66-8ea7-d20bfe5da758.png)
+
+High volumes of pizzas were ordered during Wednesday and Saturday.
+
