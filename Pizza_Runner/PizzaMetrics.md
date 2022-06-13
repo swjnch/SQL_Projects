@@ -126,7 +126,7 @@ Customer 103 had maximum number of changes included with the order.
 9. What was the total volume of pizzas ordered for each hour of the day?
                         
 			SELECT HOUR(order_time) AS hour_of_day,
-                               COUNT(order_id) AS total_pizzas
+                               COUNT(pizza_id) AS total_pizzas
                         FROM temp_orders
                         GROUP BY HOUR(order_time)
                         ORDER BY HOUR(order_time);
