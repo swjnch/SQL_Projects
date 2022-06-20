@@ -38,12 +38,8 @@ Runner 1 delivered a total of 4 orders, runner 2 delivered 3 orders and runner 3
                          SELECT pizza_name,
                                 COUNT(pizza_id) AS total_deilvered
                          FROM temp_orders
-                         JOIN
-                         temp_runners
-                         USING(ORDER_ID)
-                         JOIN 
-                         pizza_names
-                         USING(pizza_id)
+                         JOIN temp_runners USING(ORDER_ID)
+                         JOIN pizza_names USING(pizza_id)
                          WHERE cancellation = "Delivered"
                          GROUP BY pizza_id;
                          
@@ -57,12 +53,8 @@ A total of 9 Meatlovers pizza were delivered and 3 vegeterian pizzas were delive
                                   pizza_name,
                                   count(pizza_id) AS pizza_orders			 
                           FROM temp_orders
-                          JOIN
-                          temp_runners
-                          USING(ORDER_ID)
-                          JOIN 
-                          pizza_names
-                          USING(pizza_id)
+                          JOIN temp_runners USING(ORDER_ID)
+                          JOIN pizza_names USING(pizza_id)
                           GROUP BY customer_id, pizza_id
                           ORDER BY customer_id;
                           
@@ -75,9 +67,7 @@ All the customers except 104 ordered single vegeterain pizzas.
                           SELECT order_id,
                                  count(pizza_id) AS max_order
                           FROM temp_orders
-                          JOIN
-                          temp_runners
-                          USING(order_id)
+                          JOIN temp_runners USING(order_id)
                           WHERE cancellation = "Delivered"
                           GROUP BY order_id
                           ORDER BY count(pizza_id) DESC
@@ -90,14 +80,10 @@ A maximum of 3 orders were delivered in a single order for order_id 4.
 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
                           
                           SELECT customer_id,
-                                 SUM(CASE 
-                                          WHEN exclusions = "" AND extras = "" THEN 1 ELSE 0 END) AS no_changes, 
-	                               SUM(CASE 
-                                          WHEN exclusions <> "" OR extras <> "" THEN 1 ELSE 0 END) AS atleast_1_change
+                                 SUM(CASE WHEN exclusions = "" AND extras = "" THEN 1 ELSE 0 END) AS no_changes, 
+	                         SUM(CASE WHEN exclusions <> "" OR extras <> "" THEN 1 ELSE 0 END) AS atleast_1_change
                            FROM temp_orders
-                           JOIN
-                           temp_runners
-                           USING(order_id)
+                           JOIN temp_runners USING(order_id)
                            WHERE cancellation = "Delivered"
                            GROUP BY customer_id;
                            
@@ -111,9 +97,7 @@ Customer 103 had maximum number of changes included with the order.
                                         SELECT customer_id,
 	                                             SUM(CASE WHEN exclusions <> "" AND extras <> "" THEN 1 ELSE 0 END) AS total_extras
                                         FROM temp_orders
-                                        JOIN
-                                        temp_runners
-                                        USING(order_id)
+                                        JOIN temp_runners USING(order_id)
                                         WHERE cancellation = "Delivered"
                                         GROUP BY customer_id)
                                                         SELECT * FROM extras_pizza
