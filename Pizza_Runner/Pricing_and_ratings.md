@@ -131,4 +131,3 @@ A total of 142$ was made in profits for the pizza runners if the toppings were c
                                FROM delivery_cte;
 			       
 ![image](https://user-images.githubusercontent.com/104596844/174687964-07981a8a-45f2-4816-ac6f-119a3a029212.png)
-
