@@ -1,29 +1,28 @@
 ## Ingredient Optimisation
 
 USE pizza_runner;
-
-1. What are the standard ingredients for each pizza?
-
-        CREATE TEMPORARY TABLE toppings_list
-                                    SELECT pizza_recipes.pizza_id,
-                                           SUBSTRING_INDEX(SUBSTRING_INDEX(pizza_recipes.toppings, ',', numbers.n), ',', -1) toppings
-                                    FROM
-                                         (SELECT 1 n UNION ALL
-                                          SELECT 2 UNION ALL SELECT 3 UNION ALL
-                                          SELECT 4 UNION ALL SELECT 5 UNION ALL
-                                          SELECT 6 UNION ALL SELECT 7 UNION ALL
-                                          SELECT 8 UNION ALL SELECT 9) numbers INNER JOIN pizza_recipes
-                                   ON CHAR_LENGTH(pizza_recipes.toppings)-CHAR_LENGTH(REPLACE(pizza_recipes.toppings, ',', ''))>=numbers.n-1
-                                   ORDER BY pizza_id, n;
-                                   
-        SELECT pizza_name,
-               GROUP_CONCAT(topping_name) AS toppings_list
-        FROM toppings_list
-        JOIN pizza_toppings
-        ON toppings_list.toppings = pizza_toppings.topping_id
-        JOIN pizza_names USING(pizza_id)
-        GROUP BY pizza_name
-        ORDER BY pizza_id;
+# What are the standard ingredients for each pizza?
+CREATE TEMPORARY TABLE toppings_list
+SELECT
+  pizza_recipes.pizza_id,
+  SUBSTRING_INDEX(SUBSTRING_INDEX(pizza_recipes.toppings, ',', numbers.n), ',', -1) toppings
+FROM
+  (SELECT 1 n UNION ALL
+   SELECT 2 UNION ALL SELECT 3 UNION ALL
+   SELECT 4 UNION ALL SELECT 5 UNION ALL
+   SELECT 6 UNION ALL SELECT 7 UNION ALL
+   SELECT 8 UNION ALL SELECT 9) numbers INNER JOIN pizza_recipes
+  ON CHAR_LENGTH(pizza_recipes.toppings)-CHAR_LENGTH(REPLACE(pizza_recipes.toppings, ',', ''))>=numbers.n-1
+  ORDER BY
+  pizza_id, n;
+  
+  SELECT pizza_name,
+         GROUP_CONCAT(topping_name) AS toppings_list
+  FROM toppings_list
+  JOIN pizza_toppings ON toppings_list.toppings = pizza_toppings.topping_id
+  JOIN pizza_names USING(pizza_id)
+  GROUP BY pizza_name
+  ORDER BY pizza_id;
 
 ## Reference - https://stackoverflow.com/questions/17942508/sql-split-values-to-multiple-rows
 
@@ -34,8 +33,7 @@ SELECT order_id,
        SUBSTRING_INDEX(SUBSTRING_INDEX(temp_orders.extras, ',', numbers.n), ',', -1) extras
        FROM
   (SELECT 1 n UNION ALL SELECT 2)numbers INNER JOIN temp_orders
-  ON CHAR_LENGTH(temp_orders.extras)
-     -CHAR_LENGTH(REPLACE(temp_orders.extras, ',', ''))>=numbers.n-1
+  ON CHAR_LENGTH(temp_orders.extras)-CHAR_LENGTH(REPLACE(temp_orders.extras, ',', ''))>=numbers.n-1
 WHERE extras <> ""
 ORDER BY pizza_id, n)
         SELECT topping_name,
@@ -79,9 +77,9 @@ JOIN pizza_names
 USING(pizza_id)
 ),
 toppings_cte AS(
-SELECT sc.order_id,
-       sc.pizza_id,
-       sc.customer_id,
+              SELECT sc.order_id,
+                    sc.pizza_id,
+                    sc.customer_id,
        sc.pizza_name,
        p1.topping_name AS exclusion_1,
        p2.topping_name AS exclusion_2,
@@ -160,41 +158,125 @@ extras_cte AS(
                        (SELECT 1 n UNION ALL SELECT 2)numbers INNER JOIN cte_recipes
                ON CHAR_LENGTH(cte_recipes.extras)-CHAR_LENGTH(REPLACE(cte_recipes.extras, ',', '')) >= numbers.n-1
                ORDER BY row_num, pizza_id, n),
-ingredients_cte AS(
-                SELECT * FROM toppings_cte
-                WHERE toppings NOT IN(SELECT toppings FROM exclusions_cte)
-                UNION ALL 
-                SELECT * FROM extras_cte
-                ORDER BY row_num),
+joined_cte AS(
+                (SELECT * FROM toppings_cte
+                  WHERE (row_num, order_id, customer_id, pizza_id, toppings) NOT IN
+				(SELECT row_num, 
+                        order_id, 
+                        customer_id, 
+                        pizza_id, 
+                        CAST(toppings AS UNSIGNED) as toppings
+                 FROM exclusions_cte))
+				 UNION ALL
+                 SELECT row_num, 
+                        order_id, 
+                        customer_id, 
+                        pizza_id, 
+                        CAST(toppings AS UNSIGNED) as toppings
+                 FROM extras_cte 
+                 WHERE toppings <> 0
+				ORDER BY row_num),
 frequency_cte AS(
                 SELECT row_num,
-                       order_id,
-                       customer_id,
-                       pizza_id,
-                       t1.toppings,
-                       t2.topping_name,
-                       COUNT(t2.topping_name) AS frequency
-                FROM ingredients_cte t1
-                JOIN pizza_toppings t2
-				ON t1.toppings=t2.topping_id
-                GROUP BY 1, 2, t2.topping_name
-               ORDER BY 1,2),
+	                   order_id,
+	                  customer_id,
+	                   pizza_id,
+                       pizza_name,
+	                   toppings,
+	                   topping_name,
+		               COUNT(topping_name) AS frequency
+				FROM joined_cte
+                JOIN pizza_names USING(pizza_id)
+				JOIN pizza_toppings ON joined_cte.toppings = pizza_toppings.topping_id
+                GROUP BY row_num, order_id, topping_name),
 ingredient_cte AS(
-                   SELECT *,
-						CASE WHEN frequency = 1 THEN topping_name ELSE CONCAT(frequency, 'x ', topping_name)
-                        END AS ingredient_count
-                   FROM frequency_cte
-                   JOIN pizza_names
-                   USING(pizza_id)),
+                 SELECT *,
+		               CASE WHEN frequency = 1 THEN topping_name ELSE CONCAT(frequency, 'x ', topping_name)
+		                END AS ingredient_count
+		         FROM frequency_cte),
 recipe_cte AS(
-              SELECT *,
-                     GROUP_CONCAT(ingredient_count ORDER BY topping_name) AS recipe
-			 FROM ingredient_cte
-             GROUP BY row_num, order_id, pizza_id)
+               SELECT *,
+	                  GROUP_CONCAT(ingredient_count ORDER BY topping_name) AS recipe
+	                  FROM ingredient_cte
+	                  GROUP BY row_num, order_id, pizza_id)
 SELECT order_id,
-       pizza_id,
        customer_id,
        CONCAT(pizza_name, " : ", recipe) AS ingredients_list
 FROM recipe_cte;
 
 # What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?
+WITH cte_recipes AS(
+					SELECT  ROW_NUMBER() OVER() AS row_num,
+                            order_id,
+                           customer_id,
+                           pizza_id,
+                          (CASE WHEN exclusions IS NULL OR exclusions = "null" THEN "" ELSE exclusions
+                          END) AS exclusions,
+                          (CASE WHEN extras IS NULL OR extras = "null" THEN "" ELSE extras
+                           END) AS extras,
+                           toppings
+                    FROM customer_orders
+                    JOIN pizza_recipes USING(pizza_id)
+                    JOIN runner_orders USING(order_id)
+                    WHERE distance <> "null" and duration <> "null"
+                   ),
+toppings_cte AS(
+               SELECT row_num,
+                      order_id,
+                      customer_id,
+                      pizza_id,
+                      SUBSTRING_INDEX(SUBSTRING_INDEX(cte_recipes.toppings, ',', numbers.n), ',', -1) toppings
+			  FROM
+                     (SELECT 1 n UNION ALL
+                      SELECT 2 UNION ALL SELECT 3 UNION ALL
+                      SELECT 4 UNION ALL SELECT 5 UNION ALL
+                      SELECT 6 UNION ALL SELECT 7 UNION ALL
+					  SELECT 8 UNION ALL SELECT 9) numbers 
+			 INNER JOIN cte_recipes
+             ON CHAR_LENGTH(cte_recipes.toppings)-CHAR_LENGTH(REPLACE(cte_recipes.toppings, ',', ''))>=numbers.n-1
+             ORDER BY row_num, pizza_id, n),
+exclusions_cte AS(
+                  SELECT row_num,
+                         order_id,
+                         customer_id,
+                         pizza_id,
+                         SUBSTRING_INDEX(SUBSTRING_INDEX(cte_recipes.exclusions, ',', numbers.n), ',', -1) toppings
+				  FROM
+                       (SELECT 1 n UNION ALL SELECT 2) numbers INNER JOIN cte_recipes
+                  ON CHAR_LENGTH(cte_recipes.exclusions)-CHAR_LENGTH(REPLACE(cte_recipes.exclusions, ',', '')) >= numbers.n-1
+                  ORDER BY row_num, pizza_id, n),
+extras_cte AS(
+                SELECT row_num,
+                       order_id,
+                       customer_id,
+                       pizza_id,
+                       SUBSTRING_INDEX(SUBSTRING_INDEX(cte_recipes.extras, ',', numbers.n), ',', -1) toppings
+				FROM
+                       (SELECT 1 n UNION ALL SELECT 2)numbers INNER JOIN cte_recipes
+               ON CHAR_LENGTH(cte_recipes.extras)-CHAR_LENGTH(REPLACE(cte_recipes.extras, ',', '')) >= numbers.n-1
+               ORDER BY row_num, pizza_id, n),
+joined_cte AS(
+                (SELECT * FROM toppings_cte
+                  WHERE (row_num, order_id, customer_id, pizza_id, toppings) NOT IN
+				(SELECT row_num, 
+                        order_id, 
+                        customer_id, 
+                        pizza_id, 
+                        CAST(toppings AS UNSIGNED) as toppings
+                 FROM exclusions_cte))
+				 UNION ALL
+                 SELECT row_num, 
+                        order_id, 
+                        customer_id, 
+                        pizza_id, 
+                        CAST(toppings AS UNSIGNED) as toppings
+                 FROM extras_cte 
+                 WHERE toppings <> 0
+				ORDER BY row_num)
+SELECT topping_name,
+		COUNT(topping_name) AS total_quantity
+FROM joined_cte
+JOIN pizza_names USING(pizza_id)
+JOIN pizza_toppings ON joined_cte.toppings = pizza_toppings.topping_id
+GROUP BY topping_name
+ORDER BY COUNT(topping_name) DESC;
