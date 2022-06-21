@@ -12,7 +12,7 @@
            ELSE exclusions
            END) AS exclusions,
 		(CASE
-           WHEN extras IS NULL OR exclusions = "null" THEN ""
+           WHEN extras IS NULL OR extras = "null" THEN ""
            ELSE extras
            END) AS extras,
         order_time
