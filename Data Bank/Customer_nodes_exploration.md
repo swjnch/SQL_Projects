@@ -91,5 +91,4 @@ previous and start dates for new nodes are assisgned. Finnaly to find the averag
  Both the temporary table and common table expressions were used to generate median and percentile values.All the 5 regions have a median of 16 days that is similar to the average, which indicates that data is normally distributed and symmetric. Regions 1,2 and 4 have 24 days in the 80th percentile, regions 3 and 5 have 25days and 26days respectively. The 5 regions have 29 days in the 95th percentile.
 
 
-                                                                     
-                                                                     
+                                                                                                                                   
