@@ -1,4 +1,4 @@
-## Ingredient Optimisation
+## Ingredient Optimization
 
 USE pizza_runner;
 
