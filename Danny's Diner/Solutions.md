@@ -137,7 +137,7 @@ Customer A has ordered sushi and curry.Customer B ordered sushi
 					    
 ![image](https://user-images.githubusercontent.com/104596844/172223155-b136b3eb-fd28-48d0-b370-9f6982a6c247.png)
 
-Customer A ordered a total of 2 items that total upto 25$ and Customer B ordered 3 items for 40$.
+Customer A ordered a total of 2 items that total upto 25$ and  Customer  B  ordered  3  items  for  40$.
 
 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
