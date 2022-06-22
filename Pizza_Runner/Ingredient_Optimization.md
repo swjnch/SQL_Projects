@@ -115,6 +115,8 @@ Cheese is the commion exclusion.
 			 
 ![image](https://user-images.githubusercontent.com/104596844/174697207-cb1644f9-3938-4d85-8fc5-a3d2f9126bb6.png)
 
+First extras and exlusions are seperated to different columns and joined with pizza_toppings table using topping_id to generate name of each topping. Using CONCAT with CASE statement and different conditions, string with pizza_name along with items excluded and added was included.
+
 5.Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients
 ##### For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
 
@@ -209,6 +211,8 @@ Cheese is the commion exclusion.
 									 
 ![image](https://user-images.githubusercontent.com/104596844/174698503-a540664f-89b7-4eba-be82-0f0e8a174d7b.png)
 
+Similar to Question 1 comma seperated values are converted to rows for toppings, extras and exclusions with CTE's. exlusions_cte was removed from toppings_cte with WHERE NOT EXISTS and joined with extras_cte using UNION ALL. ALong, with joins toppings for extras_cte and exclusions_cte are converted to INT data type. With CONCAT, CASE statement and COUNT the desired output is generated.
+
 6. What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?
 
                 WITH cte_recipes AS(
@@ -285,4 +289,6 @@ Cheese is the commion exclusion.
                                         ORDER BY COUNT(topping_name) DESC;
 					
 ![image](https://user-images.githubusercontent.com/104596844/174699983-ba66590f-20ae-4eb7-9eaa-274ec3d5f8cd.png)
+
+Solution to this problem is similar to the above question. 
 
