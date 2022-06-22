@@ -28,6 +28,8 @@ USE pizza_runner;
 ![image](https://user-images.githubusercontent.com/104596844/174695671-20014d2d-ac87-46ce-a9b6-9e88d2e8e169.png)
 
 
+
+
 2. What was the most commonly added extra?
 
         WITH extras_cte AS(
