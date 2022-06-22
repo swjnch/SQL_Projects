@@ -1,4 +1,5 @@
-# SQL-Challenge
+## 8 week SQL Challenge :+1:
 
-For my SQL Portfolio, I have chosen case studies from Danny Ma’s 8-week SQL Challenge. This repository contains code submissions for the challenges I have completed. 
+
+This repository contains code submissions for the Danny Ma’s 8-week SQL Challenge I have completed. The first 4 case studies were soloved using MySQL.
 Please refer to the [website](https://8weeksqlchallenge.com/getting-started/) for information about case studies. 
