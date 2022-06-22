@@ -4,7 +4,7 @@ USE pizza_runner;
 
 1. What are the standard ingredients for each pizza?
 
-       CREATE TEMPORARY TABLE toppings_list
+                              WITH toppings_list AS(
                                            SELECT pizza_recipes.pizza_id,
                                                   SUBSTRING_INDEX(SUBSTRING_INDEX(pizza_recipes.toppings, ',', numbers.n), ',', -1) toppings
                                                   FROM
@@ -12,11 +12,10 @@ USE pizza_runner;
                                                    SELECT 2 UNION ALL SELECT 3 UNION ALL
                                                    SELECT 4 UNION ALL SELECT 5 UNION ALL
                                                    SELECT 6 UNION ALL SELECT 7 UNION ALL
-                                                   SELECT 8 UNION ALL SELECT 9) numbers INNER JOIN pizza_recipes
+                                                   SELECT 8) numbers INNER JOIN pizza_recipes
                                           ON CHAR_LENGTH(pizza_recipes.toppings)-CHAR_LENGTH(REPLACE(pizza_recipes.toppings, ',', ''))>=numbers.n-1
                                           ORDER BY
-                                          pizza_id, n;
-  
+                                          pizza_id, n)
                                          SELECT pizza_name,
                                                 GROUP_CONCAT(topping_name) AS toppings_list
                                          FROM toppings_list
@@ -27,7 +26,7 @@ USE pizza_runner;
 
 ![image](https://user-images.githubusercontent.com/104596844/174695671-20014d2d-ac87-46ce-a9b6-9e88d2e8e169.png)
 
-
+Using substring_index the toppings column in pizza_recipes table is split in to individual elements and arranged in rows. pizza_names and pizza_toppings are joined using topping_id and pizza_id with the cte table to generate respective names for pizzas and toppings. GROUP_CONCAT is used to group all the toppings to a string.
 
 
 2. What was the most commonly added extra?
@@ -49,6 +48,8 @@ USE pizza_runner;
 					   
 ![image](https://user-images.githubusercontent.com/104596844/174695935-f14fb8ec-4524-4761-9cc7-0d9a1074c889.png)
 
+Bacon is the commonly added extra.
+
 
 3. What was the most common exclusion?
 
@@ -68,6 +69,8 @@ USE pizza_runner;
                                                 GROUP BY topping_name;
 						
 ![image](https://user-images.githubusercontent.com/104596844/174696256-231dd471-e8d8-49fb-b09b-f33c6a59599b.png)
+
+Cheese is the commion exclusion.
         
 4.Generate an order item for each record in the customers_orders table in the format of one of the following:
    ##### Meat Lovers
@@ -107,7 +110,7 @@ USE pizza_runner;
                                      WHEN exclusion_1 <> exclusion_2 AND extras_1 <> extras_2 THEN CONCAT(pizza_name," - "," Exclude ", exclusion_1," , ",                                                      exclusion_2, " - ", " Extra ", extras_1," , ", extras_2)
 			             WHEN exclusion_1 = exclusion_2 AND extras_1 <> extras_2 THEN CONCAT(pizza_name," - "," Exclude ", exclusion_1, " - ", 
 				           " Extra  ", extras_1," , ", extras_2)
-                                      WHEN exclusion_1 <> exclusion_2 AND extras_1 = extras_2 THEN CONCAT(pizza_name," - "," Exclude ", exclusion_1," , ",                                                       exclusion_2, " - ", " Extra ", extras_1) END) AS customized_order
+                                     WHEN exclusion_1 <> exclusion_2 AND extras_1 = extras_2 THEN CONCAT(pizza_name," - "," Exclude ", exclusion_1," , ",                                                       exclusion_2, " - ", " Extra ", extras_1) END) AS customized_order
                          FROM toppings_cte;
 			 
 ![image](https://user-images.githubusercontent.com/104596844/174697207-cb1644f9-3938-4d85-8fc5-a3d2f9126bb6.png)
