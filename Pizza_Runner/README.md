@@ -1,4 +1,4 @@
-# Case Study 2-Pizza Runner
+## Case Study 2-Pizza Runner :pizza: 
 
 ### Introduction
 Did you know that over 115 million kilograms of pizza is consumed daily worldwide??? (Well according to Wikipedia anyway…)
