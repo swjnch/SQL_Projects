@@ -1,6 +1,4 @@
-## Case Study 1-Danny's Diner         
-
-![image](https://user-images.githubusercontent.com/104596844/175171070-2ba9bae9-9b1e-4b7b-bd43-2af3e84ad0e4.png)
+## Case Study 1-Danny's Diner :bowl_with_spoon:     
 
                                                                  
 ### Introduction
