@@ -21,5 +21,9 @@ Danny has shared with you 3 key datasets for this case study:
 
 Please refer to this [link](https://8weeksqlchallenge.com/case-study-1/) for ER diagram and datasets.
 
+The primary learning points in this case study are:
+1. Aggregate functions like COUNT, SUM  with GROUP BY and JOINS
+2. Working with Commom Table Expressions (CTE), CASE Statements
+3. Usage of windows function like RANK(), DENSE_RANK() along with PARTITION
 
 
