@@ -1,4 +1,10 @@
-## Data Analysis Questions 
+### Customer Journey
+Based off the 8 sample customers provided in the sample from the subscriptions table, write a brief description about each customer’s onboarding journey.
+
+The 8 customers in the sample database started off with free trial membership and each of them upgraded to new plan after the end of trial period.
+
+
+### Data Analysis Questions 
 
 USE foodie_fi;
 
