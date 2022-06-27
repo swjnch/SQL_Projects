@@ -4,8 +4,8 @@ USE foodie_fi;
 
 1. How many customers has Foodie-Fi ever had?
 
-                            SELECT COUNT(DISTINCT customer_id) AS total_customers
-                                    FROM subscriptions;
+             SELECT COUNT(DISTINCT customer_id) AS total_customers
+             FROM subscriptions;
                                     
 ![image](https://user-images.githubusercontent.com/104596844/172413888-82db175e-7eff-47d6-8a62-fccb2057ed21.png)
 
@@ -15,12 +15,9 @@ Foodie-Fi has a total of 1000 customers.
 
                             SELECT MONTH(start_date) AS  start_month,
                                    plan_name,
-	                                 COUNT(plan_id) AS count
-                            FROM
-                            plans
-                            JOIN
-                            subscriptions 
-                            USING(plan_id)
+	                           COUNT(plan_id) AS count
+                            FROM plans
+                            JOIN subscriptions USING(plan_id)
                             WHERE plan_id = 0
                             GROUP BY MONTH(start_date)
                             ORDER BY start_month;
@@ -33,12 +30,9 @@ The month of March has highest number(94) of trial plan subscriptions.
                                   
                                  SELECT  plan_name,
                                           COUNT(plan_id) as count
-                                 FROM
-                                 plans
-                                 JOIN
-                                 subscriptions 
-                                 USING(plan_id)
-                                 WHERE start_date > "2020-12-31"
+                                 FROM plans
+                                 JOIN subscriptions USING(plan_id)
+                                 WHERE YEAR(start_date) > 2020
                                  GROUP BY plan_id
                                  ORDER BY count;
                                  
@@ -50,16 +44,13 @@ Basic Monthly plans has a total of 8 subscribers, pro monthly has 60 subscribers
 
                               SELECT  COUNT(customer_id) AS customer_count,
                                       ROUND(COUNT(customer_id)/(SELECT COUNT(DISTINCT customer_id) FROM subscriptions) * 100 , 1) AS churn_percentage 
-                              FROM
-                              plans
-                              JOIN
-                              subscriptions 
-                              USING(plan_id)
+                              FROM plans
+                              JOIN subscriptions USING(plan_id)
                               WHERE plan_id = 4;
                               
 ![image](https://user-images.githubusercontent.com/104596844/172417176-9527d2b6-588e-4c8d-926a-c26bc224d1a1.png)
 
-A total of 307 of 1000 customers(30.7%) have churned from there subscription palns
+Churned percentage rate is 30.7%.
 
 5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?
 
@@ -67,12 +58,9 @@ A total of 307 of 1000 customers(30.7%) have churned from there subscription pal
                                                     SELECT *, 
                                                            RANK () OVER (partition by customer_id order by plan_id ) ranking
                                                      FROM subscriptions
-                                                     JOIN
-                                                     plans 
-                                                    USING(plan_id)
-                                                    )
-                                              SELECT COUNT(customer_id) AS total_customers_churned,
-	                                                   ROUND(COUNT(customer_id)/(SELECT COUNT(DISTINCT customer_id) FROM subscriptions) * 100) AS perc_churn_initial_trail
+                                                     JOIN plans USING(plan_id))
+                                      SELECT COUNT(customer_id) AS total_customers_churned,
+	                                     ROUND(COUNT(customer_id)/(SELECT COUNT(DISTINCT customer_id) FROM subscriptions) * 100) AS perc_churn_initial_trail
                                               FROM churn_data
                                               WHERE plan_id = 4 AND ranking = 2;
                                               
@@ -86,18 +74,15 @@ A total of 307 of 1000 customers(30.7%) have churned from there subscription pal
                                                    SELECT *, 
                                                          RANK () OVER (partition by customer_id order by plan_id ) ranking
                                                     FROM subscriptions
-                                                    JOIN
-                                                   plans 
-                                                   USING(plan_id)
-                                                   )
-                                                       SELECT plan_id,
-                                                              plan_name,
-                                                              COUNT(*) AS conversions,
-                                                              ROUND(100 * COUNT(*)/ (SELECT COUNT(DISTINCT customer_id) FROM subscriptions),1) AS perc_plans
+                                                    JOIN plans USING(plan_id))
+                                                     SELECT plan_id,
+                                                            plan_name,
+                                                             COUNT(*) AS conversions,
+                                                             ROUND(100 * COUNT(*)/ (SELECT COUNT(DISTINCT customer_id) FROM subscriptions),1) AS perc_plans
                                                       FROM after_trail_cte
                                                       WHERE ranking = 2
                                                       GROUP BY plan_id
-                                                     ORDER BY plan_id;
+                                                      ORDER BY plan_id;
 
 ![image](https://user-images.githubusercontent.com/104596844/172419131-6e56325a-d8bb-4451-ae91-6ceb5c7abedf.png)
 
@@ -108,18 +93,15 @@ There are more number of basic monthly customers(54.6%) subscribed after the ini
                                  WITH ct_plans AS (
                                                      SELECT *,
                                                             RANK() OVER(PARTITION BY customer_id ORDER BY start_date DESC) AS ranking
-                                                     FROM
-                                                     subscriptions 
+                                                     FROM subscriptions 
                                                      JOIN plans USING(plan_id)
-                                                     WHERE
-                                                     start_date <= '2020-12-31'
-                                                   )      
+                                                     WHERE YEAR(start_date) <= 2020)      
                                                      SELECT plan_name,
                                                             COUNT(*) AS conversions,
                                                             ROUND(100 * COUNT(*)/(SELECT COUNT(DISTINCT customer_id) FROM subscriptions),1) AS perc_plans
                                                      FROM ct_plans
                                                      WHERE ranking = 1
-                                                    GROUP BY plan_id
+                                                     GROUP BY plan_id
                                                      ORDER BY conversions DESC;
                                                      
  ![image](https://user-images.githubusercontent.com/104596844/172420316-f8c56556-4c24-47d6-bf16-321678de5524.png)
@@ -145,19 +127,15 @@ By end of 2020 there are 32.6% of pro monthly subscribers and only 1.9% of trail
                                                        SELECT customer_id,
 		                                              start_date
                                                        FROM subscriptions 
-                                                       WHERE plan_id = 0
-                                                     ),
+                                                       WHERE plan_id = 0),
                                      upgrade_data AS (
                                                     SELECT customer_id, 
                                                            start_date as upgrade_date
                                                     FROM subscriptions 
-	                                            WHERE plan_id = 3
-                                                    )
-                                                       SELECT ROUND(AVG(DATEDIFF(upgrade_date, start_date)),0) as AVG_DAYS
-                                                       FROM trail_date 
-                                                       JOIN 
-                                                       upgrade_data
-                                                       ON trail_date.customer_id=upgrade_data.customer_id;
+	                                            WHERE plan_id = 3)
+                                                    SELECT ROUND(AVG(DATEDIFF(upgrade_date, start_date)),0) as AVG_DAYS
+                                                     FROM trail_date 
+                                                     JOIN upgrade_data ON trail_date.customer_id=upgrade_data.customer_id;
 						   
 ![image](https://user-images.githubusercontent.com/104596844/172438748-717f8621-4811-416d-8538-62415b76fb0a.png)
 
@@ -171,18 +149,15 @@ On average it would take 105 days to upgrade to annual plan.
                                                                     start_date,
                                                                     plan_name
                                                               FROM subscriptions 
-                                                              JOIN plans
-                                                              USING(plan_id)
-                                                             WHERE plan_id = 0
-                                                            ),
+                                                              JOIN plans USING(plan_id)
+                                                             WHERE plan_id = 0),
                                           upgrade_data AS (
                                                             SELECT plan_id AS plan_id_upgrade,
                                                                    customer_id,
                                                                   start_date as upgrade_date,
                                                                   plan_name as plan_name_upgrade
                                                            FROM subscriptions 
-                                                           JOIN plans 
-                                                           USING(plan_id)
+                                                           JOIN plans USING(plan_id)
 	                                                   WHERE plan_id = 3
                                                            ),
                                             grouped_data AS(
@@ -204,10 +179,7 @@ On average it would take 105 days to upgrade to annual plan.
                                                                           WHEN DATEDIFF(upgrade_date, start_date) > 360 THEN "360 + days"
                                                                    END AS grouped_dates
                                                                    FROM trail_date 
-                                                                   JOIN 
-                                                                   upgrade_data
-                                                                   USING(customer_id)
-								   )
+                                                                   JOIN upgrade_data USING(customer_id))
 								      SELECT plan_name_upgrade,
                                                                              grouped_dates,
                                                                              COUNT(*) AS total_customers
@@ -240,14 +212,11 @@ There are more customers upgraded betweeen 0-30 days(49 customers)
                                                       SELECT *,
 	                                                     RANK () OVER (partition by customer_id order by start_date) ranking FROM 
                                                       subscriptions
-                                                      JOIN
-                                                      plans
-                                                      USING(plan_id)
+                                                      JOIN plans USING(plan_id)
                                                       WHERE (plan_id = 1 OR plan_id=2) AND start_date BETWEEN "2020-01-01" AND "2020-12-31"
-                                                      ORDER BY customer_id
-						      )
-                                                        SELECT COUNT(customer_id) AS count FROM ct
-                                                        WHERE plan_id=1 AND ranking = 2;
+                                                      ORDER BY customer_id)
+                                                       SELECT COUNT(customer_id) AS count FROM ct
+                                                       WHERE plan_id=1 AND ranking = 2;
 							
 ![image](https://user-images.githubusercontent.com/104596844/172442565-c1942883-026c-408d-8383-7570f425c18a.png)
 
