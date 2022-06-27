@@ -7,9 +7,9 @@
 - upgrades from pro monthly to pro annual are paid at the end of the current billing period and also starts at the end of the month period
 - once a customer churns they will no longer make payments
 
+I have used PostgreSQL to solve this problem as I had issues trying to generate a series of dates using MySQL. generate_series function in PostgreSQL made it easier to generate dates using the required interval. In the first CTE, I sorted data by the year 2020, excluded free trial membership, and assigned each plan end date which is the beginning date of the new plan using the LEAD function (i.e payment_date here). 
 
-
-       USE foodie_fi;
+In the next CTE, monthly payment dates are generated between start_date and payment_date with a 1month+1sec interval to avoid double payments. Finally, in the last query membership prices were adjusted for customers who upgraded their plans before the former plan’s end period. 
 
        WITH payments_cte AS(
                SELECT customer_id,
@@ -42,6 +42,6 @@
                        RANK() OVER(PARTITION BY customer_id ORDER BY payment_date) AS payment_order 
               FROM series_cte;
 	      
-	 ![image](https://user-images.githubusercontent.com/104596844/175841695-5d940b63-5ebd-44f2-9b7f-9f1a6d98b212.png)
+![image](https://user-images.githubusercontent.com/104596844/175841695-5d940b63-5ebd-44f2-9b7f-9f1a6d98b212.png)
 
 
