@@ -1,4 +1,4 @@
-# Case Study 4 - Data Bank
+### Case Study 4 - Data Bank :chart: 	:dollar:
 
 ### Introduction
 
