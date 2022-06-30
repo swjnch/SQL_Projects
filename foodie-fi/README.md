@@ -1,4 +1,4 @@
-### Case Study 3-Foodie-Fi :tv::sushi:
+### Case Study 3-Foodie-Fi :avocado:
 
 ### Introduction
 
