@@ -1,4 +1,4 @@
-## Case Study 1-Danny's Diner :bowl_with_spoon:     
+## Case Study 1-Danny's Diner :ramen:     
 
                                                                  
 ### Introduction
