@@ -87,3 +87,5 @@ For this multi-part challenge question - you have been requested to generate the
             ORDER BY customer_id;
 
 Using all of the data available - how much data would have been required for each option on a monthly basis?
+
+##### Option 1: data is allocated based off the amount of money at the end of the previous month
