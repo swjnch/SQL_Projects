@@ -23,47 +23,67 @@ For this multi-part challenge question - you have been requested to generate the
 
 - customer balance at the end of each month
 
-          WITH txn_cte AS(
-                        SELECT customer_id,
-                               (date_trunc('month', txn_date) + interval '1 month - 1 day') AS txn_month,
-                               SUM(CASE WHEN txn_type='deposit' THEN txn_amount ELSE - txn_amount END) AS txn_amt 
-                        FROM data_bank.customer_transactions
-                        GROUP BY customer_id, txn_month
-                        ORDER BY customer_id, txn_month),
-           closing_cte AS(
-                          SELECT *,
-	                               SUM(txn_amt) over(PARTITION BY customer_id ORDER BY txn_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS closing_balance
-                          FROM txn_cte),
-           end_month AS(
-                       SELECT DISTINCT customer_id,
-                              ('2020-01-31'::date + (generate_series(0,3,1) * INTERVAL'1 MONTH')) AS end_month
-                       FROM data_bank.customer_transactions
-                     ORDER BY customer_id, end_month),
-           t1_cte AS(
-                    SELECT e.customer_id,
-                           e.end_month,
-                           ce.txn_amt,
-                           ce.closing_balance
-                    FROM end_month e
-                    LEFT JOIN closing_cte ce
-                    ON e.end_month = ce.txn_month
-                    AND e.customer_id = ce.customer_id),
-          t2_cte AS(
-                    SELECT *,
-                          count(closing_balance) OVER(PARTITION BY customer_id order by end_month) as _grp
-                    FROM t1_cte
-                    ORDER BY customer_id),
-           t3_cte AS(
-                    SELECT *,
-                          CASE WHEN txn_amt ISNULL THEN 0 ELSE txn_amt END AS txn_amt_1,
-                          FIRST_VALUE(closing_balance) OVER(PARTITION BY customer_id,_grp ORDER BY _grp) AS closing_balance_new
-                    FROM t2_cte
-                    ORDER BY customer_id)
-           SELECT customer_id,
-                   end_month AS txn_month,
-                   txn_amt_1 AS transaction_balance,
-                   closing_balance_new AS closing_balance
-           FROM t3_cte;
+          CREATE TEMPORARY TABLE closing_balance AS(
+WITH txn_cte AS(
+SELECT customer_id,
+      (date_trunc('month', txn_date) + interval '1 month - 1 day') AS txn_month,
+      SUM(CASE WHEN txn_type='deposit' THEN txn_amount ELSE - txn_amount END) AS txn_amt 
+FROM data_bank.customer_transactions
+GROUP BY customer_id, txn_month
+ORDER BY customer_id, txn_month),
+closing_cte AS(
+SELECT *,
+	 SUM(txn_amt) over(PARTITION BY customer_id
+	 ORDER BY txn_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS closing_balance
+FROM txn_cte),
+end_month AS(
+SELECT DISTINCT customer_id,
+       ('2020-01-31'::date + (generate_series(0,3,1) * INTERVAL'1 MONTH')) AS end_month
+FROM data_bank.customer_transactions
+ORDER BY customer_id, end_month),
+balance_cte AS(
+SELECT e.customer_id,
+       e.end_month,
+       ce.txn_amt,
+       ce.closing_balance
+FROM end_month e
+LEFT JOIN closing_cte ce
+ON e.end_month = ce.txn_month
+AND e.customer_id = ce.customer_id),
+apr_cte AS(                 
+SELECT * FROM balance_cte
+WHERE DATE_PART('MONTH', end_month) IN (1,2,3) OR closing_balance IS NOT NULL),
+mar_cte AS(
+SELECT *,
+       ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY end_month DESC) row_num
+FROM apr_cte),
+mar_cte2 AS(
+SELECT * FROM mar_cte
+WHERE row_num IN (2,3,4) OR closing_balance IS NOT NULL),
+feb_cte AS(
+SELECT *,
+       ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY end_month DESC) row_num1
+FROM mar_cte2),
+feb_cte2 AS(
+SELECT * FROM feb_cte
+WHERE row_num1 <> 1 OR closing_balance IS NOT NULL),
+count_cte AS(
+SELECT customer_id,
+       end_month AS txn_month,
+       txn_amt AS transaction_balance,
+       closing_balance,
+       count(closing_balance) OVER(PARTITION BY customer_id order by end_month) as _grp
+FROM feb_cte2
+ORDER BY customer_id, txn_month),
+final_cte AS(
+SELECT customer_id,
+       txn_month,
+       CASE WHEN transaction_balance ISNULL THEN 0 ELSE transaction_balance END AS transaction_balance,
+       FIRST_VALUE(closing_balance) OVER(PARTITION BY customer_id,_grp ORDER BY _grp) AS closing_balance
+FROM count_cte
+ORDER BY customer_id, txn_month)
+SELECT * FROM final_cte);
+
    
 - minimum, average and maximum values of the running balance for each customer
 
