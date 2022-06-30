@@ -27,4 +27,4 @@ Please refer to the [link](https://8weeksqlchallenge.com/case-study-2/) for ER d
 5. Pizza Metrics are solved using aggregate functions with joins and date time extraction functions.
 6. Runner and Customer experience questions are solved mainly with Common table expressions(CTE), date time extracts, joins and aggregate functions.
 7. Ingredient Optimazation section is the challenging part of this case study. The key learning points from this analysis is the use of substring_index to convert comma seperated values to rows and GROUP_CONCAT to change row values to  a single row. Postgresql has inbuilt functions that make the procees easier, while MYsql uses different join conditions.
-8. Pricing and ratings involve analysis of profits and extra revenue and adding new column for ratings of each runner CTE's, groupby, aggregate functions, time conversions and difference.
+8. Pricing and ratings involve analysis of profits and extra revenue and adding new column for ratings of each runner using CTE's, groupby, aggregate functions, time conversions and difference.
