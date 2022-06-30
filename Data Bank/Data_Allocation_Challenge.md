@@ -67,4 +67,23 @@ For this multi-part challenge question - you have been requested to generate the
    
 - minimum, average and maximum values of the running balance for each customer
 
+          WITH txn_cte AS(
+                SELECT customer_id,
+                       txn_date,
+                       SUM(CASE WHEN txn_type='deposit' THEN txn_amount ELSE - txn_amount END) AS txn_amt 
+               FROM data_bank.customer_transactions
+               GROUP BY customer_id, txn_date
+              ORDER BY customer_id, txn_date),
+          balance_cte AS(
+                SELECT *,
+                       SUM(txn_amt) over(PARTITION BY customer_id ORDER BY txn_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS balance
+                FROM txn_cte)
+           SELECT customer_id,
+                  MIN(txn_amt) AS MIN_BALANCE,
+                  MAX(txn_amt) AS MAX_BALANCE,
+                  ROUND(AVG(txn_amt),2) AS AVG_BALANCE
+            FROM balance_cte
+            GROUP BY customer_id
+            ORDER BY customer_id;
+
 Using all of the data available - how much data would have been required for each option on a monthly basis?
