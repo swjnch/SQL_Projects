@@ -40,36 +40,63 @@
 
                  CREATE TEMPORARY TABLE tmp AS
                  WITH median_ct AS(
-				                           SELECT *, 
-					                               LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date) AS new_node,
-					                               CASE 
-						                                 WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))- node_id)= 0 THEN NULL
-						                                 WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))- node_id) <> 0
-						                                 THEN (LEAD(start_date,1) OVER (PARTITION BY customer_id ORDER BY start_date))
-						                                 END as new_node_date
-				                            FROM data_bank.customer_nodes
-				                            WHERE EXTRACT(YEAR FROM end_date) <> 9999),
-                                days_cte AS(
-                                           SELECT *,
-                                                  (new_node_date - start_date) AS total_days
-			                                     FROM median_ct
-			                                     WHERE node_id <> new_node
-                                           ORDER BY region_id, (new_node_date - start_date)
-                                            )
+				   SELECT *, 
+					 LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date) AS new_node,
+					 CASE 
+				         WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))- node_id)= 0 THEN NULL
+				         WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))node_id<> 0
+					       THEN (LEAD(start_date,1) OVER (PARTITION BY customer_id ORDER BY start_date))
+				         END as new_node_date
+				  FROM data_bank.customer_nodes
+				  WHERE EXTRACT(YEAR FROM end_date) <> 9999),
+                      days_cte AS(
+                                  SELECT *,
+                                        (new_node_date - start_date) AS total_days
+			          FROM median_ct
+			          WHERE node_id <> new_node
+                                  ORDER BY region_id, (new_node_date - start_date)
+                                  )
                                  SELECT * FROM days_cte;
                    
                  WITH median_table AS(
+                                 SELECT region_id, 
+	                                total_days, 
+                                        count(*) OVER(partition by region_id) as no_of_records,
+				        row_number() over (partition by region_id order by total_days) as rownum
+                                  FROM tmp)
+                                 SELECT region_id,
+                                        region_name,
+				         total_days as percentile_values
+		                 FROM median_table
+                                 JOIN data_bank.regions USING(region_id)
+		                 WHERE rownum in (round(0.50*no_of_records));
+				 
+	         WITH median_table AS(
                                 SELECT region_id, 
-	                                     total_days, 
+	                               total_days, 
                                        count(*) OVER(partition by region_id) as no_of_records,
-				                               row_number() over (partition by region_id order by total_days) as rownum
+				       row_number() over (partition by region_id order by total_days) as rownum
                                 FROM tmp)
-                                       SELECT region_id,
-				                                      total_days as percentile_values
-		                                   FROM median_table
-		                                   WHERE rownum in (round(0.50*no_of_records), 
-						                                            round(0.80*no_of_records), 
-						                                            round(0.95*no_of_records));
+                                SELECT region_id,
+                                       region_name,
+				       total_days as percentile_values
+		                FROM median_table
+                                JOIN data_bank.regions USING(region_id)
+		                WHERE rownum in (round(0.80*no_of_records));
+				
+		WITH median_table AS(
+                                SELECT region_id, 
+	                               total_days, 
+                                       count(*) OVER(partition by region_id) as no_of_records,
+				       row_number() over (partition by region_id order by total_days) as rownum
+                                FROM tmp)
+                                SELECT region_id,
+                                       region_name,
+				       total_days as percentile_values
+		                FROM median_table
+                                JOIN data_bank.regions USING(region_id)
+		                WHERE rownum in (round(0.95*no_of_records));
+                    
                     
                     
                     
