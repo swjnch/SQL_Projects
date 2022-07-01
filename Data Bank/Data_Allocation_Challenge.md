@@ -128,5 +128,22 @@ Using all of the data available - how much data would have been required for eac
          
 ##### Option 3: data is updated real-time
 
+           WITH txn_cte AS(
+                       SELECT customer_id,
+                              txn_date,
+                              SUM(CASE WHEN txn_type='deposit' THEN txn_amount ELSE - txn_amount END) AS txn_amt 
+                       FROM data_bank.customer_transactions
+                       GROUP BY customer_id, txn_date
+                       ORDER BY customer_id, txn_date),
+          balance_cte AS(
+                       SELECT *,
+                             SUM(txn_amt) over(PARTITION BY customer_id ORDER BY txn_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS balance
+                        FROM txn_cte)
+          SELECT txn_date,
+                SUM(balance) AS total_amount
+          FROM balance_cte
+          GROUP BY txn_date
+          ORDER BY txn_date;
+
 
 
