@@ -112,3 +112,21 @@ Using all of the data available - how much data would have been required for eac
 
 ##### Option 1: data is allocated based off the amount of money at the end of the previous month
 
+           SELECT txn_month,
+                  SUM(CASE WHEN closing_balance >= 0 THEN closing_balance END) AS total_amount
+           FROM closing_balance
+           GROUP BY txn_month
+           ORDER BY txn_month;
+
+##### Option 2: data is allocated on the average amount of money kept in the account in the previous 30 days
+
+           SELECT txn_month,
+                  ROUND(avg(CASE WHEN closing_balance >= 0 THEN closing_balance END),2) AS avg_amt 
+           FROM closing_balance
+           GROUP BY txn_month;
+     
+         
+##### Option 3: data is updated real-time
+
+
+
