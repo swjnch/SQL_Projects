@@ -118,19 +118,37 @@
 
             WITH cte AS(
                       SELECT *,
-                             LAG(closing_balance,3) OVER (PARTITION BY customer_id ORDER BY txn_month) previous_balance
+                            ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY txn_month) AS RnASC,
+                            ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY txn_month DESC) AS RnDesc 
                       FROM closing_balance),
-            percent_cte AS(
-                      SELECT customer_id, 
-                             txn_month, 
-                             closing_balance, 
-                             previous_balance, 
-                             ROUND((1.0 * (closing_balance - previous_balance)) / previous_balance,2) AS percentage
-                      FROM cte  
-                      WHERE txn_month = '2020-04-30'
-                      AND closing_balance::TEXT NOT LIKE '-%'
-                      GROUP BY customer_id, txn_month, closing_balance, previous_balance
-                      ORDER BY customer_id)
-            SELECT * FROM percent_cte 
-            WHERE percentage > 5.0
-            ORDER BY customer_id;
+            order_cte AS(
+                      SELECT customer_id,
+                             txn_month,
+                             closing_balance    
+                      FROM cte
+                      WHERE RnAsc = 1 OR RnDesc = 1
+                      ORDER BY customer_id, txn_month),
+             previous_balance_cte AS(
+                       SELECT *,
+                              ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY txn_month) AS row_num,
+                              LAG(closing_balance, 1) OVER (PARTITION BY customer_id ORDER BY txn_month) previous_balance
+                      FROM order_cte),
+             percent_cte AS(
+                        SELECT customer_id, 
+                               txn_month, 
+                               closing_balance, 
+                               previous_balance, 
+                               ROUND((1.0 * (closing_balance - previous_balance)) / previous_balance,2) AS percentage
+                         FROM previous_balance_cte 
+                         WHERE row_num=2 AND closing_balance::TEXT NOT LIKE '-%'
+                         GROUP BY customer_id, txn_month, closing_balance, previous_balance
+                         ORDER BY customer_id)
+              SELECT * FROM percent_cte 
+              WHERE percentage > 5.0
+              ORDER BY customer_id;
+	      
+![image](https://user-images.githubusercontent.com/104596844/176984615-e7ae6258-7397-41fd-9883-7e8366f1249e.png)
+![image](https://user-images.githubusercontent.com/104596844/176984656-0fbbeff6-f9de-42e0-89bc-6fb70b40f41c.png)
+
+
+
