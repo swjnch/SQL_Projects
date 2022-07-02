@@ -7,6 +7,8 @@
                SUM(txn_amount) AS total_amount
         FROM data_bank.customer_transactions
         GROUP BY txn_type;
+	
+![image](https://user-images.githubusercontent.com/104596844/176982257-45b02080-53e6-4b4e-83e6-1a4bdba10ed9.png)
 
 2. What is the average total historical deposit counts and amounts for all customers?
 
@@ -22,6 +24,8 @@
                          ROUND(AVG(avg_amount),2) AS avg_amount
                   FROM deposit_cte
                   WHERE txn_type = 'deposit';
+		  
+![image](https://user-images.githubusercontent.com/104596844/176982312-9da5088e-93be-456e-9a0b-80b317a30a7a.png)
 
 3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?
 
@@ -40,6 +44,8 @@
 		              WHERE deposit_total >= 2 AND (purchase_total >= 1 OR withdrawal_total >= 1)
                               GROUP BY txn_month
                               ORDER BY txn_month;
+			      
+![image](https://user-images.githubusercontent.com/104596844/176982337-55a6f283-c64a-4d20-9ba0-cbbf3a9c30f2.png)
                  
 4.What is the closing balance for each customer at the end of the month?
 
@@ -105,6 +111,8 @@
                                                   SELECT * FROM final_cte);
 
                               SELECT * FROM closing_balance;
+			      
+![image](https://user-images.githubusercontent.com/104596844/176982467-eb65338e-46f0-4a2d-b851-af3b9ed6dc94.png)
 
 5. What is the percentage of customers who increase their closing balance by more than 5%?
 
