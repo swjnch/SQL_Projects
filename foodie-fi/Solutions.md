@@ -227,7 +227,7 @@ There are more customers upgraded betweeen 0-30 days(49 customers)
 ![image](https://user-images.githubusercontent.com/104596844/172442565-c1942883-026c-408d-8383-7570f425c18a.png)
 
 None of the customers downgraded from pro monthly to a basic monthly plan in 2020
-							
+
 © 2022 GitHub, Inc.
 Terms
 Privacy
