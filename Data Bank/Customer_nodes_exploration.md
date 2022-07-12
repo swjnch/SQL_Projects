@@ -124,7 +124,6 @@ There are a total of 5 nodes.
 
 ![image](https://user-images.githubusercontent.com/104596844/176972318-cfbe13d9-dcd2-460e-879a-3e9b2f4a34c8.png)
                     
-                    
-                    
+              
                     
 
