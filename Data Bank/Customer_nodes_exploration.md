@@ -59,7 +59,7 @@ There are a total of 5 nodes.
 					 LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date) AS new_node,
 					 CASE 
 				         WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))- node_id)= 0 THEN NULL
-				         WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date))node_id<> 0
+				         WHEN ((LEAD(node_id,1) OVER (PARTITION BY customer_id ORDER BY start_date)) - node_id<> 0
 					       THEN (LEAD(start_date,1) OVER (PARTITION BY customer_id ORDER BY start_date))
 				         END as new_node_date
 				  FROM data_bank.customer_nodes
