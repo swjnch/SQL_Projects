@@ -1,6 +1,6 @@
-### Case Study 4 - Data Bank :chart: 	:dollar:
+#### Case Study 4 - Data Bank :chart: 	:dollar:
 
-### Introduction
+#### Introduction
 
 There is a new innovation in the financial industry called Neo-Banks: new aged digital only banks without physical branches.
 
@@ -14,8 +14,12 @@ The management team at Data Bank want to increase their total customer base - bu
 
 This case study is all about calculating metrics, growth and helping the business analyse their data in a smart way to better forecast and plan for their future developments!
 
-### Available Data
+#### Available Data
 
 The Data Bank team have prepared a data model for this case study as well as a few example rows from the complete dataset below to get you familiar with their tables.
 
-Please refer to this [page](https://8weeksqlchallenge.com/case-study-4/) for ER diagrams, data tables and questions.
+Please refer to this [page](https://8weeksqlchallenge.com/case-study-4/) for ER diagrams, data tables and questions.PostgreSQL is used for this case study.
+
+#### The key highlights of the case study are:
+
+
