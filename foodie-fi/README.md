@@ -1,4 +1,4 @@
-#### Case Study 3-Foodie-Fi :avocado:
+### Case Study 3-Foodie-Fi :avocado:
 
 #### Introduction
 
