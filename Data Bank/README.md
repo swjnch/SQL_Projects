@@ -22,5 +22,7 @@ Please refer to this [page](https://8weeksqlchallenge.com/case-study-4/) for ER 
 
 #### The key highlights of the case study are:
 
-1. Aggregate functions like AVG, COUNT are used with GROUPBY to calculate average days for new nodes allocation, count of customers in each region. 
-2. Using LEAD and ROW_NUMBER() function along with subrtraction, COUNT(), 
+1.	Aggregate functions like AVG and COUNT are used with GROUP BY to calculate average days for new nodes allocation, and the count of customers in each region. 
+2.	Non-aggregate window functions like LAG () and LEAD () are used to assign values from succeeding and preceding rows in the same result set. 
+3.	ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW window function was used to generate running totals for closing balance at end of each month for all the customers.
+
