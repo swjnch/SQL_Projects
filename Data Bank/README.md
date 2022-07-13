@@ -22,4 +22,5 @@ Please refer to this [page](https://8weeksqlchallenge.com/case-study-4/) for ER 
 
 #### The key highlights of the case study are:
 
-
+1. Aggregate functions like AVG, COUNT are used with GROUPBY to calculate average days for new nodes allocation, count of customers in each region. 
+2. Using LEAD and ROW_NUMBER() function along with subrtraction, COUNT(), 
