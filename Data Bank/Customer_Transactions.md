@@ -49,6 +49,8 @@
                  
 4.What is the closing balance for each customer at the end of the month?
 
+In the first step, end date of each month is extracted using date_trunc and deposits with negative balance are assigned "-". Using ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW 
+
             CREATE TEMPORARY TABLE closing_balance AS(
                                      WITH txn_cte AS(
                                                SELECT customer_id,
