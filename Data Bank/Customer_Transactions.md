@@ -49,9 +49,7 @@
                  
 4.What is the closing balance for each customer at the end of the month?
 
-In the first step, end date of each month was extracted using date_trunc, deposits with negative balance are assigned "-" and the sum of each month deposits were calculated. To get the cumulative totals SUM is used with ORDER BY along with UNBOUNDED PRECEDING which is the first row until the current row. Using generate_series a series of end dates starting from 2020-01-31 to 2020-04-30 were generated. 
-
-
+In the first step, end date of each month was extracted using date_trunc, deposits with negative balance are assigned "-" and the sum of each month deposits were calculated. To get the cumulative totals SUM is used with ORDER BY along with UNBOUNDED PRECEDING which is the first row until the current row. Using generate_series a series of end dates starting from 2020-01-31 to 2020-04-30 were generated and based on the last txn_date data was filtered with various conditions for all the customers.Using COUNT with PARTITION BY and FIRST_VALUE() the null values in the closing_balance column were replaced with the previous month's balance.
 
             CREATE TEMPORARY TABLE closing_balance AS(
                                      WITH txn_cte AS(
