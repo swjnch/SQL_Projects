@@ -118,6 +118,8 @@ In the first step, end date of each month was extracted using date_trunc, deposi
 
 5. What is the percentage of customers who increase their closing balance by more than 5%?
 
+The closing_balance table from the above question is used to solve this. Data was filtered for the first and last month balance and using the percent change formula the customers who increased their closing balance by more than 5% were determined. 
+
             WITH cte AS(
                       SELECT *,
                             ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY txn_month) AS RnASC,
