@@ -8,6 +8,8 @@ For this multi-part challenge question - you have been requested to generate the
 
 - running customer balance column that includes the impact each transaction
 
+Running balance is the amount credited or debited on each transaction day. In this case study withdrawals and purchases are credited amounts, deposits are considered as debits. 
+
           WITH txn_cte AS(
                       SELECT customer_id,
                              txn_date,
@@ -88,6 +90,8 @@ For this multi-part challenge question - you have been requested to generate the
 
    
 - minimum, average and maximum values of the running balance for each customer
+
+Using the running customer balance generated in the first step, the descriptive statistics for each customer were determined. 
 
           WITH txn_cte AS(
                 SELECT customer_id,
