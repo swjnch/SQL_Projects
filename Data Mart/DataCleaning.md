@@ -26,16 +26,14 @@ In a single query, perform the following operations and generate a new table in 
                CASE WHEN segment LIKE '%1' THEN 'Young Adults'
                     WHEN segment LIKE '%2' THEN 'Middle Aged'
                     WHEN segment LIKE '%3' OR segment LIKE '%4' THEN 'Retirees'
-                    WHEN segment='null' THEN 'Unknown'
-               END AS age_band,
+                    ELSE 'Unknown' END AS age_band,
               CASE WHEN segment LIKE 'C%' THEN 'Couples'
                    WHEN segment LIKE 'F%' THEN 'Families'
-                   WHEN segment='null' THEN 'Unknown'
-              END AS demographic,
+                   ELSE 'Unknown' END AS demographic,
               region,
               platform,
               customer_type,
               transactions,
               sales,
-              ROUND((sales/transactions),2) AS avg_transactions
+              ROUND(sales/transactions::numeric,2) AS avg_transactions
         FROM  data_mart.weekly_sales;
