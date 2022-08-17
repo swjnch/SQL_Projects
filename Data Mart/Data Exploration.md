@@ -6,13 +6,14 @@
  ![image](https://user-images.githubusercontent.com/104596844/184898637-b4425fa5-7465-4245-b8f9-101465476c1e.png)
  
 3. What range of week numbers are missing from the dataset?
-       
+ 
+ Let's look into the week numbers of the aggregated sales in the dataset.
+ 
        SELECT DISTINCT(week_number) 
        FROM clean_weekly_sales
        ORDER BY week_number;
- ![image](https://user-images.githubusercontent.com/104596844/184899752-bac4ce48-a0d9-4912-87ca-09b8bde2357b.png)
  
-![image](https://user-images.githubusercontent.com/104596844/184900208-925ab32d-d7f3-494e-9993-c586af2fc1c9.png)
+ Weeks 13-36 are present in the dataset
 
       WITH series_cte AS(
       SELECT * FROM generate_series(1,52))
@@ -21,9 +22,7 @@
       (SELECT DISTINCT(week_number) 
       FROM clean_weekly_sales);
       
- ![image](https://user-images.githubusercontent.com/104596844/184901652-71ec06d8-2d21-453a-b28c-3861948b6170.png)
-
-![image](https://user-images.githubusercontent.com/104596844/184901833-427f4711-0f34-46a9-93db-7343d8a7db84.png)
+  Week numbers in the range 1-12 and 37-52 are not included in the dataset.
  
 5. How many total transactions were there for each year in the dataset?
     
