@@ -46,6 +46,7 @@ customer_type
 
 ![image](https://user-images.githubusercontent.com/104596844/184922448-9a9bc89d-27d1-42b6-bfa9-76e7e574e5dc.png)
 
-
+Asia and Oceania has major reduction in sales compared to other regions, only Europe has 4.0% increase in sales after the implementation of sustainable packaging.
+Looking at the platforms the sales increased for shopify customers where as the sales for retail decreased by 2.43%. In the previous exercise we identified majority of the sales for Retail is contributed by Retirees. Unknown in age_band and demographic had significant sales reduction, it is important to identify these group of customers to have clear picture of .
 
 
