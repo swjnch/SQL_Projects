@@ -126,6 +126,8 @@ In each of the demographics, Retirees have the most retail sales. The primary re
 
 15. Can we use the avg_transaction column to find the average transaction size for each year for Retail vs Shopify? If not - how would you calculate it instead?
 
+The avg_transaction column cannot be used to calculate average transaction size because the average is calculated based on the total sales and transactions for each week. 
+
          SELECT platform,
                 calendar_year,
                 ROUND(SUM(sales)/SUM(transactions)::NUMERIC,2) AS avg_transactions
