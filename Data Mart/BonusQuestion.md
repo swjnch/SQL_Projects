@@ -2,11 +2,12 @@
 
 Which areas of the business have the highest negative impact in sales metrics performance in 2020 for the 12 week before and after period?
 
-region
-platform
-age_band
-demographic
-customer_type
+-- region
+-- platform
+-- age_band
+-- demographic
+-- customer_type
+
 Do you have any further recommendations for Danny’s team at Data Mart or any interesting insights based off this analysis?
 
 region
@@ -47,6 +48,9 @@ customer_type
 ![image](https://user-images.githubusercontent.com/104596844/184922448-9a9bc89d-27d1-42b6-bfa9-76e7e574e5dc.png)
 
 Asia and Oceania has major reduction in sales compared to other regions, only Europe has 4.0% increase in sales after the implementation of sustainable packaging.
-Looking at the platforms the sales increased for shopify customers where as the sales for retail decreased by 2.43%. In the previous exercise we identified majority of the sales for Retail is contributed by Retirees. Unknown in age_band and demographic had significant sales reduction, it is important to identify these group of customers to have clear picture of .
+Looking at the platforms the sales increased for shopify customers where as the sales for retail decreased by 2.43%. In the previous exercise we identified majority of the sales for Retail is contributed by Retirees. Unknown in age_band and demographic had significant sales reduction, it is important to identify these group of customers to have more understanding of customer segments. There is 1.01% growth in sales for new customers and major reduction is for guest customers. 
+
+One of the strategies the company could implement is by supporting an community project involving climate change or sustainabilty. Additionally, conducting periodic surveys could help understand the customer needs. Promotional offers from time to time could help retain new and existing customers.Labeling the general practices for recycling on the package could help customers about disposal practices.
+
 
 
