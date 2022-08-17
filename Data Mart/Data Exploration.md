@@ -79,6 +79,8 @@ Refer to monthly_regional_sales.csv
            ORDER BY demographic, calendar_year;
            
  ![image](https://user-images.githubusercontent.com/104596844/184914189-b93911ff-bc87-4230-8fda-cb83a2239905.png)
+ 
+ In the year 2020 both Couples and Families contributed to the highest percentage of sales. Compartively, Families had greater percentage of sales each year than couples. Also, the unknowm demographics had higher sales compared to Families and couples.
 
 14. Which age_band and demographic values contribute the most to Retail sales?
 
@@ -119,6 +121,8 @@ Demographic and Age_band
         ORDER BY demographic, age_band;
         
 ![image](https://user-images.githubusercontent.com/104596844/184913151-fbd12c9d-d478-4a26-903f-27b93ba8fd31.png)
+
+In each of the demographics, Retirees have the most retail sales. The primary reason could be the ease of internet usage among Middle age and young adults.
 
 15. Can we use the avg_transaction column to find the average transaction size for each year for Retail vs Shopify? If not - how would you calculate it instead?
 
