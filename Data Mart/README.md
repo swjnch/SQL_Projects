@@ -23,3 +23,8 @@ The columns are pretty self-explanatory based on the column names but here are s
 4. <b>transactions</b> is the count of unique purchases made through Data Mart and sales is the actual dollar amount of purchases
 5. Each record in the dataset is related to a specific aggregated slice of the underlying <b>sales</b> data rolled up into a week_date value which represents the start of the sales week.
 
+#### Key Learning Points 
+
+1. Data cleaning and manipulation that involved generating new columns from existing columns, null values replacement and grouping data.
+2. Usage of aggregation functions like SUM(), COUNT() with GROUP BY. 
+3. Analyzing the impact(in this case growth of sales) of a certain action before and after implementation. 
