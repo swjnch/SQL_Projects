@@ -27,4 +27,5 @@ The columns are pretty self-explanatory based on the column names but here are s
 
 1. Data cleaning and manipulation that involved generating new columns from existing columns, null values replacement and grouping data.
 2. Usage of aggregation functions like SUM(), COUNT() with GROUP BY. 
-3. Analyzing the impact(in this case growth of sales) of a certain action before and after implementation. 
+3. Utilizing SUM(SUM()) OVER(PARTITION BY ) to aggreagte data by column 
+4. Analyzing the impact(in this case growth of sales) of a certain action before and after implementation
